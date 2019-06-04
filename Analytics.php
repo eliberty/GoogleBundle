@@ -8,7 +8,8 @@ use AntiMattr\GoogleBundle\Analytics\Impression;
 use AntiMattr\GoogleBundle\Analytics\Item;
 use AntiMattr\GoogleBundle\Analytics\Product;
 use AntiMattr\GoogleBundle\Analytics\Transaction;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class Analytics
 {
@@ -20,7 +21,16 @@ class Analytics
     const TRANSACTION_KEY      = 'google_analytics/transaction';
     const ITEMS_KEY            = 'google_analytics/items';
 
-    private $container;
+    /**
+     * @var SessionInterface
+     */
+    private $session;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
     private $customVariables = array();
     private $enhancedEcommerce = false;
     private $pageViewsWithBaseUrl = true;
@@ -32,14 +42,16 @@ class Analytics
     private $table_id;
 
     public function __construct(
-        ContainerInterface $container,
+        SessionInterface $session,
+        Request $request,
         array $trackers = array(),
         array $whitelist = array(),
         array $dashboard = array(),
         $sessionAutoStarted = false,
         $enhancedEcommerce = false)
     {
-        $this->container = $container;
+        $this->session = $session;
+        $this->request = $request;
         $this->enhancedEcommerce = $enhancedEcommerce;
         $this->sessionAutoStarted = $sessionAutoStarted;
         $this->trackers = $trackers;
@@ -200,8 +212,8 @@ class Analytics
      */
     public function getCustomPageView()
     {
-        $customPageView = $this->container->get('session')->get(self::CUSTOM_PAGE_VIEW_KEY);
-        $this->container->get('session')->remove(self::CUSTOM_PAGE_VIEW_KEY);
+        $customPageView = $this->session->get(self::CUSTOM_PAGE_VIEW_KEY);
+        $this->session->remove(self::CUSTOM_PAGE_VIEW_KEY);
         return $customPageView;
     }
 
@@ -218,7 +230,7 @@ class Analytics
      */
     public function setCustomPageView($customPageView)
     {
-        $this->container->get('session')->set(self::CUSTOM_PAGE_VIEW_KEY, $customPageView);
+        $this->session->set(self::CUSTOM_PAGE_VIEW_KEY, $customPageView);
     }
 
     /**
@@ -340,7 +352,7 @@ class Analytics
             $itemArray = $item->toArray();
             $itemsArray[] = $itemArray;
         }
-        $this->container->get('session')->set(self::ITEMS_KEY, $itemsArray);
+        $this->session->set(self::ITEMS_KEY, $itemsArray);
     }
 
     /**
@@ -418,7 +430,7 @@ class Analytics
             $impressionsArray[$action][] = $impressionArray;
         }
         foreach ($impressionsArray as $action => $impressionArray) {
-            $this->container->get('session')->set(self::EC_IMPRESSIONS_KEY . '/' . $action, $impressionArray);
+            $this->session->set(self::EC_IMPRESSIONS_KEY . '/' . $action, $impressionArray);
         }
     }
 
@@ -499,7 +511,7 @@ class Analytics
             $productsArray[$action][] = $productArray;
         }
         foreach ($productsArray as $action => $productArray) {
-            $this->container->get('session')->set(self::EC_PRODUCTS_KEY . '/' . $action, $productArray);
+            $this->session->set(self::EC_PRODUCTS_KEY . '/' . $action, $productArray);
         }
     }
 
@@ -575,7 +587,7 @@ class Analytics
      */
     public function getRequest()
     {
-        return $this->container->get('request');
+        return $this->request;
     }
 
     /**
@@ -665,7 +677,7 @@ class Analytics
     public function getTransaction()
     {
         $transaction = $this->getTransactionFromSession();
-        $this->container->get('session')->remove(self::TRANSACTION_KEY);
+        $this->session->remove(self::TRANSACTION_KEY);
         return $transaction;
     }
 
@@ -683,7 +695,7 @@ class Analytics
     public function setTransaction(Transaction $transaction)
     {
         $transactionArray = $transaction->toArray();
-        $this->container->get('session')->set(self::TRANSACTION_KEY, $transactionArray);
+        $this->session->set(self::TRANSACTION_KEY, $transactionArray);
     }
 
     /**
@@ -736,9 +748,9 @@ class Analytics
      */
     private function add($key, $value)
     {
-        $bucket = $this->container->get('session')->get($key, array());
+        $bucket = $this->session->get($key, array());
         $bucket[] = $value;
-        $this->container->get('session')->set($key, $bucket);
+        $this->session->set($key, $bucket);
     }
 
     /**
@@ -748,11 +760,11 @@ class Analytics
      */
     private function has($key)
     {
-        if (!$this->sessionAutoStarted && !$this->container->get('session')->isStarted()) {
+        if (!$this->sessionAutoStarted && !$this->session->isStarted()) {
             return false;
         }
         
-        $bucket = $this->container->get('session')->get($key, array());
+        $bucket = $this->session->get($key, array());
         return !empty($bucket);
     }
 
@@ -763,7 +775,7 @@ class Analytics
      */
     private function get($key)
     {
-        return $this->container->get('session')->get($key, array());
+        return $this->session->get($key, array());
     }
 
     /**
@@ -773,8 +785,8 @@ class Analytics
      */
     private function getOnce($key)
     {
-        $value = $this->container->get('session')->get($key, array());
-        $this->container->get('session')->remove($key);
+        $value = $this->session->get($key, array());
+        $this->session->remove($key);
         return $value;
     }
 
@@ -844,7 +856,7 @@ class Analytics
      */
     private function getTransactionFromSession()
     {
-        $transactionArray = $this->container->get('session')->get(self::TRANSACTION_KEY);
+        $transactionArray = $this->session->get(self::TRANSACTION_KEY);
         if (empty($transactionArray) || is_object($transactionArray)) {
             return $transactionArray;
         }
