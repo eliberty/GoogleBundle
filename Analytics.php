@@ -9,7 +9,7 @@ use AntiMattr\GoogleBundle\Analytics\Item;
 use AntiMattr\GoogleBundle\Analytics\Product;
 use AntiMattr\GoogleBundle\Analytics\Transaction;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class Analytics
 {
@@ -27,7 +27,7 @@ class Analytics
     private $session;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
     private $requestStack;
 
@@ -43,7 +43,7 @@ class Analytics
 
     public function __construct(
         SessionInterface $session,
-        Request $requestStack,
+        RequestStack $requestStack,
         array $trackers = array(),
         array $whitelist = array(),
         array $dashboard = array(),
@@ -583,7 +583,7 @@ class Analytics
     }
 
     /**
-     * @return Symfony\Component\HttpFoundation\Request $requestStack
+     * @return Symfony\Component\HttpFoundation\RequestStack $requestStack
      */
     public function getRequest()
     {
