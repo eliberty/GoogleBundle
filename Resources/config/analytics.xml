@@ -16,7 +16,7 @@
     <services>
         <service id="google.analytics" class="AntiMattr\GoogleBundle\Analytics">
             <argument type="service" id="session" />
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument>%google.analytics.trackers%</argument>
             <argument>%google.analytics.whitelist%</argument>
             <argument>%google.analytics.dashboard%</argument>

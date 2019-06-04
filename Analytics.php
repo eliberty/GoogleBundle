@@ -29,7 +29,7 @@ class Analytics
     /**
      * @var Request
      */
-    private $request;
+    private $requestStack;
 
     private $customVariables = array();
     private $enhancedEcommerce = false;
@@ -43,7 +43,7 @@ class Analytics
 
     public function __construct(
         SessionInterface $session,
-        Request $request,
+        Request $requestStack,
         array $trackers = array(),
         array $whitelist = array(),
         array $dashboard = array(),
@@ -51,7 +51,7 @@ class Analytics
         $enhancedEcommerce = false)
     {
         $this->session = $session;
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->enhancedEcommerce = $enhancedEcommerce;
         $this->sessionAutoStarted = $sessionAutoStarted;
         $this->trackers = $trackers;
@@ -583,11 +583,11 @@ class Analytics
     }
 
     /**
-     * @return Symfony\Component\HttpFoundation\Request $request
+     * @return Symfony\Component\HttpFoundation\Request $requestStack
      */
     public function getRequest()
     {
-        return $this->request;
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
