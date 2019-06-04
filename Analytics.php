@@ -583,7 +583,7 @@ class Analytics
     }
 
     /**
-     * @return Symfony\Component\HttpFoundation\RequestStack $requestStack
+     * @return Symfony\Component\HttpFoundation\Request $request
      */
     public function getRequest()
     {
