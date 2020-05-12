@@ -8,12 +8,6 @@
     "authors": [
         {"name": "Matthew Fitzgerald", "email": "matthewfitz@gmail.com"}
     ],
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/eliberty/antimattr-common-product.git"
-        }
-    ],
     "require": {
         "php": ">=7.4",
         "eliberty/antimattr-common-product": "^1.0"
