@@ -19,6 +19,5 @@
     },
     "archive": {
         "exclude": ["bin", "Tests", "*phpunit.xml"]
-    },
-    "target-dir" : "eliberty/GoogleBundle"
+    }
 }
