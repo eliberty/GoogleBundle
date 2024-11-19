@@ -3,8 +3,9 @@
 namespace AntiMattr\GoogleBundle\Extension;
 
 use AntiMattr\GoogleBundle\Helper\AdwordsHelper;
+use Twig\Extension\AbstractExtension;
 
-class AdwordsExtension extends \Twig_Extension implements \Twig_Extension_GlobalsInterface
+class AdwordsExtension extends AbstractExtension
 {
     private $adwordsHelper;
 
